@@ -9,7 +9,9 @@ from typing import Annotated, Union
 from fastapi import FastAPI, Form, Header, Request, Header
 
 app = FastAPI()
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
 templates = Jinja2Templates(directory="templates")
 
 class Patient:
@@ -56,7 +58,7 @@ async def toggle_patient(request: Request, patient_id: str):
             patients[index].done = not patients[index].done
             break
     return templates.TemplateResponse(
-        request=request, name="patients.html", context={"patients": patients}
+        request=request, name="patient.html", context={"patients": patients}
     )
 
 @app.post("/patients/{patient_id}/delete", response_class=HTMLResponse)
@@ -66,5 +68,5 @@ async def delete_patient(request: Request, patient_id: str):
             del patients[index]
             break
     return templates.TemplateResponse(
-        request=request, name="patients.html", context={"patients": patients}
+        request=request, name="patient.html", context={"patients": patients}
     )
