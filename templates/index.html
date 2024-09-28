@@ -1,0 +1,20 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HISSS</title>
+  <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon">
+  <link rel="stylesheet" href="/static/simple.min.css">
+  <script src="/static/htmx.min.js" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+</head>
+<body>
+  <h1>HISSS - Hospital Information System Super Simple</h1>
+  <h2>Patients</h2>
+  <form hx-post="/patients" hx-target="#patient" hx-swap="innerHTML" hx-on:htmx:after-request="this.reset()">
+    <input type="text" name="name" placeholder="I'd like to...">
+    <button>Create</button>
+  </form>
+  <ul id="patients" hx-get="/patients" hx-swap="innerHTML" hx-trigger="load"></ul>
+</body>
