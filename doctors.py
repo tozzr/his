@@ -11,12 +11,12 @@ from fastapi import FastAPI, Form, Header, Request, Header
 from main import templates
 
 class Doctor:
-    def __init__(self, name: str):
+    def __init__(self, name: str, profession: str):
         self.id = uuid4()
         self.name = name
-        self.done = False
+        self.profession = profession
 
-doctors = [Doctor("Dr. House")]
+doctors = [Doctor("Dr. House", "Neurologie")]
 
 router = APIRouter()
 
@@ -39,17 +39,18 @@ async def list_doctors(request: Request, hx_request: Annotated[Union[str, None],
     return JSONResponse(content=jsonable_encoder(doctors))
 
 @router.post("/", response_class=HTMLResponse)
-async def create_doctor(request: Request, name: Annotated[str, Form()]):
-    doctors.append(Doctor(name))
+async def create_doctor(request: Request, name: Annotated[str, Form()], profession: Annotated[str, Form()]):
+    doctors.append(Doctor(name, profession))
     return templates.TemplateResponse(
         request=request, name="doctor.html", context={"doctors": doctors}
     )
 
 @router.put("/{doctor_id}", response_class=HTMLResponse)
-async def update_doctor(request: Request, doctor_id: str, name: Annotated[str, Form()]):
+async def update_doctor(request: Request, doctor_id: str, name: Annotated[str, Form()], profession: Annotated[str, Form()]):
     for index, doctor in enumerate(doctors):
         if str(doctor.id) == doctor_id:
             doctor.name = name
+            doctor.profession = profession
             break
     return templates.TemplateResponse(
         request=request, name="doctor.html", context={"doctors": doctors}

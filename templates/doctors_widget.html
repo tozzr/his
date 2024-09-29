@@ -1,6 +1,7 @@
-<h2>Doctors</h2>
+<h3>Doctors</h3>
 <form hx-post="/doctors" hx-target="#doctors" hx-swap="innerHTML" hx-on:htmx:after-request="this.reset()">
-<input type="text" name="name" placeholder="doctor name">
-<button>Create</button>
+  <input type="text" name="name" placeholder="doctor name">
+  <input type="text" name="profession" placeholder="doctor profession">
+  <button>Create</button>
 </form>
 <ul id="doctors" hx-get="/doctors" hx-swap="innerHTML" hx-trigger="load"></ul>
