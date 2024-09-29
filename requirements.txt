@@ -1,5 +1,5 @@
-fastapi
+fastapi[standard]>=0.113.0,<0.114.0
 sqlmodel
-jinja2
+jinja2=3.1.4
 passlib[bcrypt]
 python-jose
