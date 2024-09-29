@@ -1,5 +1,3 @@
-
-
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -23,6 +21,14 @@ patients = [Patient("Peter Parker")]
 router = APIRouter()
 
 # all routes under /patients
+
+@router.get("/widget", response_class=HTMLResponse)
+async def widget_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="patients_widget.html", context={}
+        )
+    return JSONResponse(content=jsonable_encoder(patients))
 
 @router.get("/", response_class=HTMLResponse)
 async def list_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):

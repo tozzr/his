@@ -1,0 +1,8 @@
+<!-- templates/doctors.html -->
+{% for doctor in doctors %}
+<li>
+  <input name="name" value="{{doctor.name}}" {% if doctor.done %}style="text-decoration: line-through" disabled="true"{% endif %} hx-put="/doctors/{{doctor.id}}" hx-target="#doctors" hx-swap="innerHTML" hx-trigger="keyup changed delay:250ms">
+  <input type="checkbox" {% if doctor.done %}checked="true"{% endif %} hx-post="/doctors/{{doctor.id}}/toggle" hx-target="#doctors" hx-swap="innerHTML">
+  <input type="button" value="❌" hx-post="/doctors/{{doctor.id}}/delete" hx-target="#doctors" hx-swap="innerHTML">
+</li>
+{% endfor %}

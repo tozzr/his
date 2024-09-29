@@ -20,3 +20,6 @@ async def index(request: Request):
 
 from patients import router as patient_router
 app.include_router(patient_router, prefix="/patients", tags=["patients"])
+
+from doctors import router as doctor_router
+app.include_router(doctor_router, prefix="/doctors", tags=["doctors"])
