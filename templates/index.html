@@ -4,15 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HISSS</title>
+  <title>HIS</title>
   <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon">
   <link rel="stylesheet" href="/static/simple.min.css">
   <link rel="stylesheet" href="/static/hisss.css">
   <script src="/static/htmx.min.js" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
 </head>
 <body>
-  <h1>HISSS</h1>
-  <h2>Hospital Information System Super Simple</h2>
+  <h1>HIS</h1>
+  <h2>Hospital Information System</h2>
   <div hx-get="/patients/widget" hx-swap="innerHTML" hx-trigger="load"></div>
   <div hx-get="/doctors/widget" hx-swap="innerHTML" hx-trigger="load"></div>
 </body>
