@@ -1,1 +1,1 @@
-docker build -t hisss:latest .
+docker build -t his:latest .
