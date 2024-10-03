@@ -1,8 +1,9 @@
-<!-- templates/patients.html -->
-{% for patient in patients %}
-<li>
-  <input name="name" value="{{patient.name}}" {% if patient.done %}style="text-decoration: line-through" disabled="true"{% endif %} hx-put="/patients/{{patient.id}}" hx-target="#patients" hx-swap="innerHTML" hx-trigger="keyup changed delay:250ms">
-  <input type="checkbox" {% if patient.done %}checked="true"{% endif %} hx-post="/patients/{{patient.id}}/toggle" hx-target="#patients" hx-swap="innerHTML">
-  <input type="button" value="❌" hx-post="/patients/{{patient.id}}/delete" hx-target="#patients" hx-swap="innerHTML">
-</li>
-{% endfor %}
+<tbody>
+  {% for patient in patients %}
+  <tr>
+    <td><input name="firstname" value="{{patient.firstname}}" hx-put="/patients/{{patient.id}}" hx-target="#patients" hx-swap="innerHTML" hx-trigger="keyup changed delay:250ms">
+    <td><input name="lastname" value="{{patient.lastname}}" hx-put="/patients/{{patient.id}}" hx-target="#patients" hx-swap="innerHTML" hx-trigger="keyup changed delay:250ms">
+    <td><input type="button" value="❌" hx-post="/patients/{{patient.id}}/delete" hx-target="#patients" hx-swap="innerHTML">
+  </tr>
+  {% endfor %}
+</tbody>

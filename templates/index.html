@@ -11,7 +11,21 @@
   <script src="/static/htmx.min.js" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
 </head>
 <body>
-  <h1>Hospital Information System</h1>
-  <div hx-get="/patients/widget" hx-swap="innerHTML" hx-trigger="load"></div>
-  <div hx-get="/doctors/widget" hx-swap="innerHTML" hx-trigger="load"></div>
+  <header>
+    <h1>Hospital Information System</h1>
+    <nav>
+      <a href="#patients" hx-get="/patients/widget" hx-swap="innerHTML" hx-trigger="click" hx-target="#main">patients</a>
+      <a href="#doctors" hx-get="/doctors/widget" hx-swap="innerHTML" hx-trigger="click" hx-target="#main">doctors</a>
+      <a href="#">buildings</a>
+      <a href="#">users</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    please choose a topic from the navigation menu.
+  </main>
+
+  <footer>
+    <p>tozzr 2024</p>
+  </footer>
 </body>

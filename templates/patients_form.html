@@ -1,0 +1,6 @@
+<h3>New patient</h3>
+<form hx-post="/patients" hx-target="#main" hx-swap="innerHTML" hx-on:htmx:after-request="this.reset()">
+    <input type="text" name="firstname" placeholder="Patient firstname">
+    <input type="text" name="lastname" placeholder="Patient lastname">
+    <button>Submit</button>
+</form>

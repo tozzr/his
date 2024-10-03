@@ -1,5 +1,6 @@
 fastapi[standard]>=0.113.0,<0.114.0
-sqlmodel
+sqlalchemy
 jinja2>=3.1.4,<3.1.5
 passlib[bcrypt]
 python-jose
+psycopg2-binary

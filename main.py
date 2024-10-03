@@ -6,13 +6,12 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from jose import JWTError, jwt
-from sqlmodel import Session
 from typing import Annotated, Union
-from uuid import uuid4
 from security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from crud import authenticate_user, get_user_by_username
-from database import get_session, init_db
+from database import SessionLocal, engine
 from models import User
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
@@ -20,7 +19,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-init_db()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -35,7 +39,7 @@ from doctors import router as doctor_router
 app.include_router(doctor_router, prefix="/doctors", tags=["doctors"])
 
 @app.post("/token")
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_db)):
     user = authenticate_user(session, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -47,7 +51,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), ses
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
     return {"access_token": access_token, "token_type": "bearer"}
 
-def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)):
+def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, "your_secret_key", algorithms=["HS256"])
         username: str = payload.get("sub")

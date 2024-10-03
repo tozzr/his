@@ -1,76 +1,93 @@
-from fastapi import APIRouter, FastAPI, Request
+from fastapi import APIRouter, Depends, FastAPI, Request, Form, Header
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from uuid import uuid4
+from uuid import uuid4, UUID
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from typing import Annotated, Union
-from fastapi import FastAPI, Form, Header, Request, Header
-
+from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import UUID as UUIDSql
 from main import templates
 
-class Patient:
-    def __init__(self, name: str):
-        self.id = uuid4()
-        self.name = name
-        self.done = False
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import Session
 
-patients = [Patient("Peter Parker")]
+from database import Base, get_db
 
+class Patient(Base):
+    __tablename__ = "patients"
+    id = Column(UUIDSql(as_uuid=True), primary_key=True, default=uuid4)
+    firstname = Column(String, index=True)
+    lastname = Column(String, index=True)
+    
+    def __init__(self, firstname, lastname):
+        self.firstname = firstname
+        self.lastname = lastname
+    
 router = APIRouter()
 
 # all routes under /patients
+def get_patients(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(Patient).offset(skip).limit(limit).all()
 
 @router.get("/widget", response_class=HTMLResponse)
-async def widget_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
+async def widget_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None, db: Session = Depends(get_db)):
     if hx_request:
         return templates.TemplateResponse(
             request=request, name="patients_widget.html", context={}
         )
-    return JSONResponse(content=jsonable_encoder(patients))
+    return JSONResponse(content=jsonable_encoder(get_patients(db)))
 
-@router.get("/", response_class=HTMLResponse)
-async def list_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
+@router.get("/modal/create", response_class=HTMLResponse)
+async def widget_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
     if hx_request:
         return templates.TemplateResponse(
-            request=request, name="patient.html", context={"patients": patients}
+            request=request, name="patients_form.html", context={}
         )
     return JSONResponse(content=jsonable_encoder(patients))
 
+@router.get("/", response_class=HTMLResponse)
+async def list_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None, db: Session = Depends(get_db)):
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="patient.html", context={"patients": get_patients(db)}
+        )
+    return JSONResponse(content=jsonable_encoder(get_patients(db)))
+
 @router.post("/", response_class=HTMLResponse)
-async def create_patient(request: Request, name: Annotated[str, Form()]):
-    patients.append(Patient(name))
+async def create_patient(request: Request, firstname: Annotated[str, Form()], lastname: Annotated[str, Form()], db: Session = Depends(get_db)):
+    patient = Patient(firstname, lastname)
+    patient.id = uuid4()
+    db.add(patient)
+    db.commit()
     return templates.TemplateResponse(
-        request=request, name="patient.html", context={"patients": patients}
+        request=request, name="patients_widget.html", context={"patients": get_patients(db)}
     )
+
+
+
+
+def get_patient(db: Session, patient_id: UUID):
+    return db.query(Patient).filter(Patient.id == patient_id).first()
 
 @router.put("/{patient_id}", response_class=HTMLResponse)
-async def update_patient(request: Request, patient_id: str, name: Annotated[str, Form()]):
-    for index, patient in enumerate(patients):
-        if str(patient.id) == patient_id:
-            patient.name = name
-            break
+async def update_patient(request: Request, patient_id: UUID, firstname: Annotated[str, Form()], lastname: Annotated[str, Form()], db: Session = Depends(get_db)):
+    patient = get_patient(db, id)
+    patient.firstname = firstname
+    patient.lastname = lastname
+    db.update(patient)
+    db.commit()
+    db.refresh(patient)
     return templates.TemplateResponse(
-        request=request, name="patient.html", context={"patients": patients}
-    )
-
-@router.post("/{patient_id}/toggle", response_class=HTMLResponse)
-async def toggle_patient(request: Request, patient_id: str):
-    for index, patient in enumerate(patients):
-        if str(patient.id) == patient_id:
-            patients[index].done = not patients[index].done
-            break
-    return templates.TemplateResponse(
-        request=request, name="patient.html", context={"patients": patients}
+        request=request, name="patient.html", context={"patients": get_patients(db)}
     )
 
 @router.post("/{patient_id}/delete", response_class=HTMLResponse)
-async def delete_patient(request: Request, patient_id: str):
-    for index, patient in enumerate(patients):
-        if str(patient.id) == patient_id:
-            del patients[index]
-            break
+async def delete_patient(request: Request, patient_id: UUID, db: Session = Depends(get_db)):
+    patient = get_patient(db, patient_id)
+    db.delete(patient)
+    db.commit()
     return templates.TemplateResponse(
-        request=request, name="patient.html", context={"patients": patients}
+        request=request, name="patient.html", context={"patients": get_patients(db)}
     )
