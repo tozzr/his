@@ -4,28 +4,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HIS</title>
+  <title>HIS - Hospital Information System</title>
   <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon">
-  <link rel="stylesheet" href="/static/simple.min.css">
-  <link rel="stylesheet" href="/static/his.css">
+  <!--
+    <link rel="stylesheet" href="/static/simple.min.css">
+    <link rel="stylesheet" href="/static/his.css">
+  -->
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="/static/style.css">
   <script src="/static/htmx.min.js" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+  <script>
+    function loadContentFromHash() {
+        const hash = window.location.hash.substring(1); // Get hash without the '#'
+        if (hash) {
+          document.querySelector("#main").setAttribute("hx-get", `${hash}`);
+          document.querySelector("#main").setAttribute("hx-trigger", 'load');
+          htmx.ajax('GET', `${hash}`, { target: "#main" });
+        }
+    }
+    window.addEventListener('hashchange', loadContentFromHash);
+    window.addEventListener('load', loadContentFromHash);
+  </script>
 </head>
 <body>
-  <header>
-    <h1>Hospital Information System</h1>
-    <nav>
-      <a href="#patients" hx-get="/patients/widget" hx-swap="innerHTML" hx-trigger="click" hx-target="#main">patients</a>
-      <a href="#doctors" hx-get="/doctors/widget" hx-swap="innerHTML" hx-trigger="click" hx-target="#main">doctors</a>
-      <a href="#">buildings</a>
-      <a href="#">users</a>
-    </nav>
-  </header>
+  <div class="sidebar">
+    <div class="top">
+      <div class="logo">
+        <i class='bx bxs-shield-plus'></i>
+        <span>H-I-S</span>
+      </div>
+      <i class="bx bx-menu" id="btn"></i>
+    </div>
+    <div class="user">
+      <img src="/static/jane.jpg" alt="me" class="user-img">
+      <div>
+        <p class="bold">Dr. med. Jane Darling</p>
+        <p>Neurology</p>
+      </div>
+    </div>
+    <ul>
+      <li>
+        <a href="#/patients?page=1&size=10">
+          <i class='bx bx-male-female' ></i>
+          <span class="nav-item">patients</span>
+        </a>
+        <span class="tooltip">patients</span>
+      </li>
+      <li>
+        <a href="#/doctors/widget" hx-get="/doctors/widget" hx-swap="innerHTML" hx-trigger="click" hx-target="#main">
+          <i class='bx bxs-user-plus'></i>
+          <span class="nav-item">doctors</span>
+        </a>
+        <span class="tooltip">doctors</span>
+      </li>
+    </ul>
+  </div>
+  <script>
+    let btn = document.querySelector('#btn')
+    let sidebar = document.querySelector('.sidebar')
 
-  <main id="main">
+    btn.onclick = function() {
+      sidebar.classList.toggle('active')
+    }
+  </script>
+
+  <div class="main-content" id="main">
     please choose a topic from the navigation menu.
-  </main>
+  </div>
 
-  <footer>
-    <p>tozzr 2024</p>
-  </footer>
 </body>

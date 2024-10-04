@@ -1,4 +1,5 @@
 fastapi[standard]>=0.113.0,<0.114.0
+fastapi-pagination
 sqlalchemy
 jinja2>=3.1.4,<3.1.5
 passlib[bcrypt]

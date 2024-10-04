@@ -1,6 +1,7 @@
-<h3>New patient</h3>
-<form hx-post="/patients" hx-target="#main" hx-swap="innerHTML" hx-on:htmx:after-request="this.reset()">
-    <input type="text" name="firstname" placeholder="Patient firstname">
-    <input type="text" name="lastname" placeholder="Patient lastname">
+<h3>{% if patient.id == None %}New{% else %}Update{% endif %} patient</h3>
+<form hx-post="/patients{% if patient.id != None %}/{{patient.id}}{% endif %}" hx-target="#main" hx-swap="innerHTML" hx-on:htmx:after-request="this.reset()">
+    <input type="text" name="firstname" value="{{patient.firstname}}" placeholder="Patient firstname">
+    <input type="text" name="lastname" value="{{patient.lastname}}" placeholder="Patient lastname">
     <button>Submit</button>
+    <a href="#/patients?page=1&size=10">cancel</a>
 </form>

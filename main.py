@@ -12,9 +12,10 @@ from crud import authenticate_user, get_user_by_username
 from database import SessionLocal, engine
 from models import User
 from sqlalchemy.orm import Session
+from fastapi_pagination import Page, add_pagination
 
 app = FastAPI()
-
+add_pagination(app)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
