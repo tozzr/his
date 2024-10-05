@@ -1,0 +1,59 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HIS - Hospital Information System</title>
+  <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/htmx.min.js" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="top">
+      <div class="logo">
+        <i class='bx bxs-shield-plus'></i>
+        <span>H-I-S</span>
+      </div>
+      <i class="bx bx-menu" id="sidebar_toggle"></i>
+    </div>
+    <div class="user">
+      <img src="/static/jane.jpg" alt="me" class="user-img">
+      <div>
+        <p class="bold">Dr. med. Jane Darling</p>
+        <p>Neurology</p>
+      </div>
+    </div>
+    <ul>
+      <li>
+        <a href="/patients/list.html?size=10&page=1">
+          <i class='bx bx-male-female' ></i>
+          <span class="nav-item">patients</span>
+        </a>
+        <span class="tooltip">patients</span>
+      </li>
+      <li>
+        <a href="/doctors/list.html?page=1&size=10">
+          <i class='bx bxs-user-plus'></i>
+          <span class="nav-item">doctors</span>
+        </a>
+        <span class="tooltip">doctors</span>
+      </li>
+    </ul>
+  </div>
+  <script>
+    let sidebar_toggle = document.querySelector('#sidebar_toggle')
+    let sidebar = document.querySelector('.sidebar')
+
+    sidebar_toggle.onclick = function() {
+      sidebar.classList.toggle('active')
+    }
+  </script>
+
+  <div class="main-content" id="main">
+    {% block content %}{% endblock %}
+  </div>
+
+</body>

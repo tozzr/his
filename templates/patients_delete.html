@@ -1,6 +1,9 @@
+{% extends 'template.html' %}
+{% block content %}
 <h1>Patients</h1>
 <h3>Delete patient</h3>
 <form action="/patients/{{patient.id}}/delete" method="post">
     <button>Delete</button>
-    <a href="#/patients?page=1&size=10">cancel</a>
+    <a href="/patients/list.html?size=10&page=1">back to list</a>
 </form>
+{% endblock %}

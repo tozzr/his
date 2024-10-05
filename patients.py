@@ -9,7 +9,7 @@ from typing import Annotated, Union
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import UUID as UUIDSql
 from main import templates
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, select
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, select, or_
 from sqlalchemy.orm import Session
 
 from database import Base, get_db
@@ -32,33 +32,12 @@ router = APIRouter()
 def get_patients(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Patient).offset(skip).limit(limit).all()
 
-@router.get("/modal/create", response_class=HTMLResponse)
-async def widget_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
-    if hx_request:
-        return templates.TemplateResponse(
-            request=request, name="patients_form.html", context={"patient": Patient('','')}
-        )
-    return JSONResponse(content=jsonable_encoder(Patient('','')))
-
-@router.get("/", response_class=HTMLResponse)
-async def list_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None, db: Session = Depends(get_db)) -> Page[Patient]:
-    if hx_request:
-        return templates.TemplateResponse(
-            request=request, name="patients_list.html", context={"patients": paginate(db, select(Patient).order_by(Patient.lastname, Patient.firstname))}
-        )
-    return JSONResponse(content=jsonable_encoder(paginate(db, select(Patient).order_by(Patient.lastname))))
-
-def get_patient(db: Session, patient_id: UUID):
-    return db.query(Patient).filter(Patient.id == patient_id).first()
-
-@router.get("/{patient_id}", response_class=HTMLResponse)
-async def get_patient_form(request: Request, patient_id: UUID, hx_request: Annotated[Union[str, None], Header()] = None, db: Session = Depends(get_db)):
-    if hx_request:
-        return templates.TemplateResponse(
-            request=request, name="patients_form.html", context={"patient": get_patient(db, patient_id)}
-        )
-    return JSONResponse(content=jsonable_encoder(get_patient(db, patient_id)))
-
+# create
+@router.get("/form.html", response_class=HTMLResponse)
+async def create_patient_form(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="patients_form.html", context={"patient": Patient('','')}
+    )
 
 @router.post("/", response_class=HTMLResponse)
 async def create_patient(request: Request, firstname: Annotated[str, Form()], lastname: Annotated[str, Form()], db: Session = Depends(get_db)):
@@ -66,9 +45,63 @@ async def create_patient(request: Request, firstname: Annotated[str, Form()], la
     patient.id = uuid4()
     db.add(patient)
     db.commit()
+    return RedirectResponse(
+        '/patients/list.html?page=1&size=10', 
+        status_code=status.HTTP_302_FOUND)
+   
+# list 
+@router.get("/", response_class=HTMLResponse)
+async def list_patients(request: Request, hx_request: Annotated[Union[str, None], Header()] = None, search: Union[str, None] = '', db: Session = Depends(get_db)) -> Page[Patient]:
+    print('search: ' + search)
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="patients_list_full.html",
+            context={
+                "patients": paginate(db,
+                                select(Patient)
+                                .where(or_(Patient.lastname.ilike(f'%{search}%'), Patient.firstname.ilike(f'%{search}%')))
+                                .order_by(Patient.lastname, Patient.firstname)
+                            ),
+                "search": search
+            }
+        )
+    return JSONResponse(content=jsonable_encoder(paginate(db, select(Patient).order_by(Patient.lastname, Patient.firstname)).items))
+
+@router.get("/list.html", response_class=HTMLResponse)
+async def list_patients_html(request: Request, hx_request: Annotated[Union[str, None], Header()] = None, search: Union[str, None] = '', db: Session = Depends(get_db)) -> Page[Patient]:
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="patients_list_table.html",
+            context={
+                "patients": paginate(db,
+                                select(Patient)
+                                .where(or_(Patient.lastname.ilike(f'%{search}%'), Patient.firstname.ilike(f'%{search}%')))
+                                .order_by(Patient.lastname, Patient.firstname)
+                            ),
+                "search": search
+            }
+        )
     return templates.TemplateResponse(
-        request=request, name="patients_widget.html", context={"patients": get_patients(db)}
+        request=request, name="patients_list_full.html",
+        context={
+            "patients": paginate(db,
+                            select(Patient)
+                            .where(or_(Patient.lastname.ilike(f'%{search}%'), Patient.firstname.ilike(f'%{search}%')))
+                            .order_by(Patient.lastname, Patient.firstname)
+                        ),
+            "search": search
+        }
     )
+
+def get_patient(db: Session, patient_id: UUID):
+    return db.query(Patient).filter(Patient.id == patient_id).first()
+
+@router.get("/{patient_id}/form.html", response_class=HTMLResponse)
+async def get_patient_form(request: Request, patient_id: UUID, db: Session = Depends(get_db)):
+    return templates.TemplateResponse(
+        request=request, name="patients_form.html", context={"patient": get_patient(db, patient_id)}
+    )
+
 
 @router.post("/{patient_id}", response_class=HTMLResponse)
 async def update_patient(request: Request, patient_id: UUID, firstname: Annotated[str, Form()], lastname: Annotated[str, Form()], db: Session = Depends(get_db)):
@@ -77,11 +110,12 @@ async def update_patient(request: Request, patient_id: UUID, firstname: Annotate
     patient.lastname = lastname
     db.merge(patient)
     db.commit()
-    return templates.TemplateResponse(
-        request=request, name="patients_form.html", context={"patient": patient}
-    )
+    return RedirectResponse(
+        '/patients/list.html?page=1&size=10', 
+        status_code=status.HTTP_302_FOUND)
 
-@router.get("/{patient_id}/delete", response_class=HTMLResponse)
+# delete
+@router.get("/{patient_id}/delete-confirm.html", response_class=HTMLResponse)
 async def delete_patient_confirm(request: Request, patient_id: UUID, db: Session = Depends(get_db)) -> Page[Patient]:
     return templates.TemplateResponse(
         request=request, name="patients_delete.html", context={"patient": get_patient(db, patient_id)}
@@ -93,5 +127,5 @@ async def delete_patient(request: Request, patient_id: UUID, db: Session = Depen
     db.delete(patient)
     db.commit()
     return RedirectResponse(
-        '/#/patients?page=1&size=10', 
+        '/patients/list.html?page=1&size=10', 
         status_code=status.HTTP_302_FOUND)

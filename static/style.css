@@ -4,7 +4,12 @@
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
+.flex {
+    display: flex;
+}
+.space-between {
+    align-content: space-between;
+}
 .user-img {
     width: 50px;
     border-radius: 100%;
@@ -28,7 +33,7 @@
 .sidebar.active {
     width: 250px;
 }
-.sidebar #btn {
+.sidebar #sidebar_toggle {
     position: absolute;
     color: #fff;
     top: 0.4rem;
@@ -38,7 +43,7 @@
     transform: translateX(-50%);
     cursor: pointer;
 }
-.sidebar.active #btn {
+.sidebar.active #sidebar_toggle {
     left: 90%;
 }
 
@@ -152,18 +157,37 @@
     padding: 1rem;
 }
 
-h1 {
+h1, h2, h3 {
     margin-bottom: 0.8rem;
 }
 .list_actions {
+    width: 95%;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 0.8rem;
+}
+.list_actions input {
+    line-height: 1.6rem;
+    margin: 0 0.5rem 0 0;
+    padding: 0.2rem;
 }
 
 table {
     margin-bottom: 0.8rem;
+    min-width: 95%;
+    border-spacing: 0;
+}
+table tr th {
+    text-align: left;
+    padding: 0.8rem 0.4rem;
+    border-bottom: thin solid #ccc;
+}
+table tbody tr:hover {
+    background-color: #ddd;
 }
 table tr td {
-    padding: 0.8rem;
+    padding: 0.8rem 0.4rem;
+    text-align: left;
 }
 table tbody tr td {
     border-bottom: thin solid #ddd;
@@ -171,13 +195,54 @@ table tbody tr td {
 table i {
     color: #333;
 }
+.pagination {
+    width: 95%;
+    display: flex;
+    justify-content: space-between;
+    line-height: 1.8rem;
+    color: #333;
+}
+.pagination .select {
+    width: 90%;
+    display: flex;
+    justify-content: center;
+}
+.pagination .item_count {
+    min-width: 5%;
+    display: flex;
+    justify-content: center;
+}
+.pagination i {
+    font-size: 1.8rem;
+    line-height: 2rem;
+    color: #333;
+}
+.pagination i.inactive {
+    color: #ccc;
+}
 
-button {
+button, .btn {
     border-radius: 0.4rem;
     border: thin solid #333;
     padding: 0.4rem;
+    text-decoration: none;
+    color: #333;
 }
 
-input {
+.form-element {
+    margin-bottom: 0.8rem;
+}
+.form-element input {
     line-height: 1.8rem;
+}
+.width2 {
+    width: 2rem;
+}
+
+form {
+    min-width: 50%;
+}
+form label {
+    min-width: 15%;
+    display: inline-block;
 }

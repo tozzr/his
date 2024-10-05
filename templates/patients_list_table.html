@@ -1,0 +1,41 @@
+{% block list_table %}
+<div id="list_table">
+{% if patients.total == 0 %}
+  no items found.
+{% else %}
+<table>
+  <thead>
+    <tr><th>firstname</th><th>lastname</th><th class="width2"></th><th class="width2"></th></tr>
+  </thead>
+  <tbody>
+    {% for patient in patients.items %}
+    <tr>
+      <td>{{patient.firstname}}</td>
+      <td>{{patient.lastname}}</td>
+      <td><a href="/patients/{{patient.id}}/form.html"><i class='bx bxs-edit'></i></a></td>
+      <td><a href="/patients/{{patient.id}}/delete-confirm.html"><i class='bx bx-trash'></i></a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="pagination">
+  <div class="select">
+    {% if patients.links.self == patients.links.first %}<i class='bx bx-chevrons-left inactive'></i>{% endif %}
+    {% if patients.links.self != patients.links.first %}<a href="{{patients.links.first}}"><i class='bx bx-chevrons-left'></i></a>{% endif %}
+
+    {% if patients.links.prev == None %}<i class='bx bx-chevron-left inactive'></i>{% endif %}
+    {% if patients.links.prev != None %}<a href="{{patients.links.prev}}"><i class='bx bx-chevron-left'></i></a>{% endif %}
+    
+    <div>{{patients.page}} / {{patients.pages}}</div>
+    
+    {% if patients.links.next == None %}<i class='bx bx-chevron-right inactive'></i>{% endif %}
+    {% if patients.links.next != None %}<a href="{{patients.links.next}}"><i class='bx bx-chevron-right'></i></a>{% endif %}
+    
+    {% if patients.links.self == patients.links.last %}<i class='bx bx-chevrons-right inactive'></i>{% endif %}
+    {% if patients.links.self != patients.links.last %}<a href="{{patients.links.last}}"><i class='bx bx-chevrons-right'></i></a>{% endif %}
+  </div>
+  <div class="item_count">items: {{patients.total}}</div>
+</div>
+{% endif %}
+</div>
+{% endblock %}

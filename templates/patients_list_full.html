@@ -1,0 +1,19 @@
+{% extends 'template.html' %}
+{% block content %}
+<h1>Patients</h1>
+<div class="list_actions">
+    <div>
+      <input id="search" name="search" placeholder="search" value="{{search}}" 
+        hx-get="/patients/list.html?page=1&size=10"
+        hx-replace_url="true"
+        hx-target="#list_table"
+        hx-swap="outerHTML"
+        hx-trigger="keyup delay:0.5s"
+        hx-include="[name='search']"
+        hx-push-url="true"
+        autofocus>
+    </div>
+    <div><a href="/patients/form.html" class="btn primary">Add patient</a></div>
+</div>
+{% include 'patients_list_table.html' %}
+{% endblock %}
