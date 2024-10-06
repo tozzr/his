@@ -22,10 +22,11 @@
     <div class="user">
       <img src="/static/jane.jpg" alt="me" class="user-img">
       <div>
-        <p class="bold">Dr. med. Jane Darling</p>
+        <p class="bold">{% if user %}{{user}}{% else %}anonymous{% endif %}</p>
         <p>Neurology</p>
       </div>
     </div>
+    {% if user %}
     <ul>
       <li>
         <a href="/patients/list.html?size=10&page=1">
@@ -42,6 +43,10 @@
         <span class="tooltip">doctors</span>
       </li>
     </ul>
+    <a href="/auth/logout.html">logout</a>
+    {% else %}
+    <a href="/auth/login.html">login</a>
+    {% endif %}
   </div>
   <script>
     let sidebar_toggle = document.querySelector('#sidebar_toggle')

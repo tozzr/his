@@ -1,0 +1,8 @@
+{% extends 'template.html' %}
+{% block content %}
+<form action="/auth/token" method="post">
+    <input type="text" name="username" placeholder="username">
+    <input type="password" name="password" placeholder="password">
+    <button>Log in</button>
+</form>
+{% endblock %}

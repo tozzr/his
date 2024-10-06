@@ -8,12 +8,12 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from typing import Annotated, Union
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import UUID as UUIDSql
-from main import templates
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import Session
 
 from database import Base, get_db
+from main import templates
 class Doctor(Base):
     __tablename__ = "doctors"
     id = Column(UUIDSql(as_uuid=True), primary_key=True, default=uuid4)

@@ -1,18 +1,17 @@
 from fastapi import APIRouter, Depends, FastAPI, Request, Form, Header, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from uuid import uuid4, UUID
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import HTMLResponse, JSONResponse
 from typing import Annotated, Union
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import UUID as UUIDSql
-from main import templates
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, select, or_
 from sqlalchemy.orm import Session
 
 from database import Base, get_db
+from main import templates
 
 from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi_pagination.links import Page

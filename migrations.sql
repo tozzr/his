@@ -13,3 +13,11 @@ CREATE TABLE public.doctors (
 	birthdate date NULL,
 	CONSTRAINT doctors_pk PRIMARY KEY (id)
 );
+
+CREATE TABLE public.users (
+	id uuid DEFAULT gen_random_uuid() NOT NULL,
+	email varchar NOT NULL,
+	username varchar NOT NULL,
+	password varchar NOT NULL,
+	CONSTRAINT users_pk PRIMARY KEY (id)
+);

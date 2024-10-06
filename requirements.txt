@@ -3,5 +3,5 @@ fastapi-pagination
 sqlalchemy
 jinja2>=3.1.4,<3.1.5
 passlib[bcrypt]
-python-jose
 psycopg2-binary
+pyjwt[crypto]
