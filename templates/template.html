@@ -19,14 +19,14 @@
       </div>
       <i class="bx bx-menu" id="sidebar_toggle"></i>
     </div>
+    {% if user %}
     <div class="user">
       <img src="/static/jane.jpg" alt="me" class="user-img">
       <div>
-        <p class="bold">{% if user %}{{user}}{% else %}anonymous{% endif %}</p>
+        <p class="bold">{{user}}</p>
         <p>Neurology</p>
       </div>
     </div>
-    {% if user %}
     <ul>
       <li>
         <a href="/patients/list.html?size=10&page=1">

@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Request, status
 from fastapi_pagination import add_pagination
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -8,7 +9,7 @@ from typing import Annotated, Union
 from pydantic import BaseModel
 
 from database import SessionLocal
-from authentication import User, decode_token2
+from authentication import decode_token
 
 app = FastAPI()
 add_pagination(app)
@@ -24,8 +25,6 @@ app.include_router(patient_router, prefix="/patients", tags=["patients"])
 
 from doctors import router as doctor_router
 app.include_router(doctor_router, prefix="/doctors", tags=["doctors"])
-
-from authentication import User, get_current_active_user
 
 def check_auth(access_token: Annotated[Union[str, None], Cookie()] = None):
     return access_token
@@ -57,26 +56,27 @@ class UserAnonymousException(Exception):
     def __init__(self, message: str):
         self.message = message
         
-def checkAuthentication(request: Request) -> str | None:
+def check_authentication(request: Request) -> str | None:
     token = check_cookie(request)
     if token != None:
-        user = decode_token2(token, 'sub', 'refresh')
-        print(user)
+        user = decode_token(token, 'sub', 'refresh')
+        expires = decode_token(token, 'exp', 'refresh')
+        print(f"expires: {datetime.fromtimestamp(expires)}")
         if user:
             return user
     raise UserAnonymousException(message="user not authenticated")
 
 @app.exception_handler(UserAnonymousException)
-async def unicorn_exception_handler(request: Request, exc: UserAnonymousException):
+async def user_anonymous_exception_handler(request: Request, exc: UserAnonymousException):
     return RedirectResponse(
         '/auth/login.html?auth=false',
         status_code=status.HTTP_302_FOUND
     )
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, username: Annotated[str, Depends(checkAuthentication)]):
+async def index(request: Request, username: Annotated[str, Depends(check_authentication)]):
     return templates.TemplateResponse(request=request, name="index.html", context={"user": username})
 
 @app.get("/protected.html", response_class=HTMLResponse)
-async def index2(request: Request, username: Annotated[str, Depends(checkAuthentication)]):
+async def index2(request: Request, username: Annotated[str, Depends(check_authentication)]):
     return templates.TemplateResponse(request=request, name="protected.html", context={"user": username})
